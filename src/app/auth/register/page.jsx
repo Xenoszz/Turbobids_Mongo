@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../../components/Navbar'
 import Link from 'next/link'
 
 function RegisterPage() {
@@ -16,7 +16,7 @@ function RegisterPage() {
 
 
   return (
-    <div className='min-h-screen flex flex-col'>    
+    <div className='font-happy min-h-screen flex flex-col'>    
         <Navbar />
         <div>
             <div className='py-20 flex flex-col justify-center items-center'>
@@ -34,7 +34,7 @@ function RegisterPage() {
                 </form>
                 <div className='flex gap-20 py-5'>
                     <p>Already have an account? </p>
-                    <Link href="/login"className='text-blue-700'>Login Here</Link>
+                    <Link href="/auth/login"className='text-blue-700'>Login Here</Link>
                 </div>
             </div>
         </div>

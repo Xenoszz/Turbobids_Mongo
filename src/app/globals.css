@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: 'happyxx';
+    src: url('./fonts/happy.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

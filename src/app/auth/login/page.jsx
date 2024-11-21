@@ -1,11 +1,11 @@
 "use client"
 import React from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../../components/Navbar'
 import Link from 'next/link'
 
 function RegisterPage() {
   return (
-    <div className='min-h-screen flex flex-col'>    
+    <div className='font-happy min-h-screen flex flex-col'>    
         <Navbar />
         <div>
             <div className='py-20 flex flex-col justify-center items-center'>
@@ -19,7 +19,7 @@ function RegisterPage() {
                 </form>
                 <div className='flex gap-20 py-5 mr-10'>
                     <p>Dont't have an Account </p>
-                    <Link href="/register"className='text-blue-700'>Register</Link>
+                    <Link href="/auth/register"className='text-blue-700'>Register</Link>
                 </div>
             </div>
         </div>

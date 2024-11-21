@@ -1,9 +1,10 @@
 import React from 'react'
 import Link from 'next/link';
+import '../globals.css';
 
 export function Navbar() {
   return (
-    <nav className="bg-[#2A2F6E] text-white py-2 border-b-8 border-orange-500">
+    <nav className="font-happy bg-[#2A2F6E] text-white py-2 border-b-8 border-orange-500">
       <div className="container mx-auto px-4 flex items-center justify-start">
         <Link href="/" className="flex items-center gap-2 text-4xl font-bold mr-8 mt-2">
           <span>TurboBids</span>
