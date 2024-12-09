@@ -2,16 +2,67 @@
 import React, { useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Link from 'next/link'
+import { useRouter } from "next/navigation";
 
 function RegisterPage() {
 
-    const [firstname,setfirstname] = useState("");
-    const [lastname,setlastname] = useState("");
-    const [email,setemal] = useState("");
-    const [type,settype] = useState("");
-    const [password,setpassword] = useState("");
-    const [confirmpassword,setconfirmpassword] = useState("");
-    const [error,seterror] = useState("");
+    const [firstname, setfirstname] = useState("");
+    const [lastname, setlastname] = useState("");
+    const [email, setemail] = useState("");
+    const [password, setpassword] = useState("");
+    const [confirmpassword, setconfirmpassword] = useState("");
+    const [error, seterror] = useState("");
+    const [success, setSuccess] = useState("");
+    const router = useRouter();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (password !== confirmpassword) {
+            seterror("Password do not match!");
+            return;
+        }
+
+        if (!firstname || !lastname || !email || !password || !confirmpassword) {
+            seterror("Please complete all inputs!");
+            return;
+        }
+
+        try {
+            // Check if user already exists
+            const resCheckUser = await fetch("http://localhost:5000/api/auth/checkuser", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+
+            const { user } = await resCheckUser.json();
+
+            if (user) {
+                seterror("User already exists!");
+                return;
+            }
+
+            // Register new user
+            const res = await fetch("http://localhost:5000/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ firstname, lastname, email, password })
+            });
+
+            if (res.ok) {
+                seterror(""); // Clear any previous errors
+                setSuccess("User registration successful!");
+                router.push('/auth/login');
+            } else {
+                console.log("User registration failed.");
+                seterror("Registration failed, please try again.");
+            }
+        } catch (error) {
+            console.log("Error during registration: ", error);
+            seterror("An error occurred during registration.");
+        }
+    }
 
 
 
@@ -21,13 +72,25 @@ function RegisterPage() {
         <div>
             <div className='py-20 flex flex-col justify-center items-center'>
             <h2 className='text-4xl'>Register Page</h2>
-                <form action="">
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="text" placeholder='First name' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="text" placeholder='Last name' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="email" placeholder='Email' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="text" placeholder='Type' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='password' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='Confirm password' />
+                <form onSubmit={handleSubmit}>
+
+                {error && (
+                    <div className = 'bg-red-500 text-xl text-white py-2 px-3 rounded-xl mt-4'>
+                        {error}
+                    </div>
+                )}
+
+                {success && (
+                    <div className = 'bg-green-500 text-xl text-white py-2 px-3 rounded-xl mt-4'>
+                        {success}
+                    </div>
+                )}
+
+                <input onChange={(e) => setfirstname(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="text" placeholder='First name' />
+                <input onChange={(e) => setlastname(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="text" placeholder='Last name' />
+                <input onChange={(e) => setemail(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="email" placeholder='Email' />
+                <input onChange={(e) => setpassword(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='password' />
+                <input onChange={(e) => setconfirmpassword(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='Confirm password' />
                     <div className='flex justify-center'>
                     <button type="submit" className="w-1/2 bg-orange-500 text-white py-3 text-lg rounded-full hover:bg-blue-600 mt-6">Register</button>
                     </div>

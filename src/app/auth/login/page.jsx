@@ -1,18 +1,88 @@
 "use client"
-import React from 'react'
+import React, { useState, useEffect  } from 'react'
 import Navbar from '../../components/Navbar'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
-function RegisterPage() {
+function LoginPage() {
+
+    const [email,setemail] = useState("");
+    const [password,setpassword] = useState("");
+    const [error,seterror] = useState("");
+
+    const router = useRouter();
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: email, password }), // ส่งข้อมูลไปที่ API
+                credentials: 'include',
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+
+                router.push('/home');
+            } else {
+                // ถ้าเกิดข้อผิดพลาด, แสดงข้อความผิดพลาด
+                seterror(data.message || "Login failed");
+            }
+        } catch (error) {
+            console.log(error);
+            seterror("An error occurred during login.");
+        } 
+    };
+
+    const checkAuth = async () => {
+        try {
+            const res = await fetch("http://localhost:5000/api/protected", {
+                method: "GET",
+                credentials: "include", // เพื่อส่ง Cookie
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                console.log("User authenticated:", data.user);
+                // หากผู้ใช้ยืนยันตัวตนแล้ว, redirect ไปยังหน้า home หรือหน้าอื่นที่ต้องการ
+                router.push('/home');
+            } else {
+                console.log("Authentication failed");
+            }
+        } catch (error) {
+            console.error("Error verifying auth:", error);
+        }
+    };
+    
+
+
+
   return (
     <div className='font-happy min-h-screen flex flex-col'>    
         <Navbar />
         <div>
             <div className='py-20 flex flex-col justify-center items-center'>
             <h2 className='text-4xl'>Login Page</h2>
-                <form action="">
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="email" placeholder='Email' />
-                <input className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='password' />
+                <form onSubmit={handleSubmit}>
+
+                {error && (
+                    <div className = 'bg-red-500 text-xl text-white py-2 px-3 rounded-xl mt-4'>
+                        {error}
+                    </div>
+                )}
+
+                <input onChange={(e) => setemail(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="email" placeholder='Email' />
+                <input onChange={(e) => setpassword(e.target.value)} className = 'block border-b-2 border-gray-300 p-2 my-6 rounded-md text-3xl'type="password" placeholder='password' />
                     <div className='flex justify-center'>
                     <button type="submit" className="w-1/2 bg-orange-500 text-white py-3 text-lg rounded-full hover:bg-blue-600 mt-6">Login</button>
                     </div>
@@ -28,4 +98,4 @@ function RegisterPage() {
   )
 }
 
-export default RegisterPage
+export default LoginPage

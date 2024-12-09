@@ -2,10 +2,12 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import Navbar from '../app/components/Navbar'
-import Footer from '../app/components/Footer'
-import CarCard  from '../app/components/CarCard';
-import '../app/globals.css';
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import CarCard  from '../components/CarCard';
+import { CarSearchForm } from "../components/Car_Home/CarSearchForm";
+import { SearchButton } from "../components/Car_Home/SearchButton";
+import '../globals.css';
 import { Star } from 'lucide-react';
 
 function page() {
@@ -21,6 +23,10 @@ function page() {
     }
   };
 
+  const handleSearch = () => {
+    console.log({ brand, type, model, color });
+  };
+
   return (
     
     <div className='font-happy'>
@@ -29,19 +35,18 @@ function page() {
       </div>
 
 
-        <div className='flex justify-center'>
-          <div className='text-4xl mt-10'>
-            <h1>Discover Your Next Car at Auction Today!</h1>
-              <div className='mt-16 mb-16 border-b-4 border-black rounded-full'></div>
-                <div className='flex justify-center gap-20 mt-8 mb-8'>
-                  <Link href="/auth/register">
-                  <button type="submit" className="bg-orange-500 text-white py-3 px-12 text-lg rounded-full hover:bg-blue-600 ">Register</button>
-                  </Link>
-                  <Link href="/auth/login">
-                  <button type="submit" className="bg-[#2A2F6E] text-white py-3 px-12 text-lg rounded-full hover:bg-blue-600 ">Sign in</button>
-                  </Link>
-                </div>
-              </div>
+        <div className='p-4 md:p-8'>
+          <div className='max-w-5xl mx-auto text-3xl mt-10 '>
+            <h2>Search Your Car!</h2>
+          </div>
+          <div className='flex justify-center rounded-3xl max-w-6xl mx-auto bg-[#76A0FF]'>
+            <div className='text-4xl mt-8 mb-8'>
+                <CarSearchForm />
+            </div>
+          </div>
+          <div className="mt-6 flex justify-center">
+              <SearchButton onClick={handleSearch} />
+          </div>
           </div>
 
         <div className="flex justify-center gap-20 mt-12 mb-24">
