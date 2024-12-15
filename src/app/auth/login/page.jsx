@@ -19,9 +19,54 @@ function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    //Mongo
+    //     try {
+    //         const res = await fetch("http://localhost:5000/api/auth/login", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({ email: email, password }), // ส่งข้อมูลไปที่ API
+    //             credentials: 'include',
+    //         });
 
+    //         const data = await res.json();
+    //         if (res.ok) {
+
+    //             router.push('/home');
+    //         } else {
+    //             // ถ้าเกิดข้อผิดพลาด, แสดงข้อความผิดพลาด
+    //             seterror(data.message || "Login failed");
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //         seterror("An error occurred during login.");
+    //     } 
+    // };
+
+    // const checkAuth = async () => {
+    //     try {
+    //         const res = await fetch("http://localhost:5000/api/protected", {
+    //             method: "GET",
+    //             credentials: "include", // เพื่อส่ง Cookie
+    //         });
+
+    //         const data = await res.json();
+    //         if (res.ok) {
+    //             console.log("User authenticated:", data.user);
+    //             // หากผู้ใช้ยืนยันตัวตนแล้ว, redirect ไปยังหน้า home หรือหน้าอื่นที่ต้องการ
+    //             router.push('/home');
+    //         } else {
+    //             console.log("Authentication failed");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error verifying auth:", error);
+    //     }
+    // };
+
+        //Sql
         try {
-            const res = await fetch("http://localhost:5000/api/auth/login", {
+            const res = await fetch("http://localhost:9500/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -46,7 +91,7 @@ function LoginPage() {
 
     const checkAuth = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/protected", {
+            const res = await fetch("http://localhost:9500/api/protected", {
                 method: "GET",
                 credentials: "include", // เพื่อส่ง Cookie
             });

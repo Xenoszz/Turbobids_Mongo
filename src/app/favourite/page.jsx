@@ -1,28 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // ใช้ axios ในการดึงข้อมูลจาก Backend
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import '../globals.css';
 
-const cars = [
-  { year: 2022, model: 'BMW X4M', damage: 'Flood', status: 'Open', currentBid: 'Start the bidding' },
-  { year: 2023, model: 'BMW X4M', damage: 'None', status: 'Open', currentBid: '300,00 $' },
-  { year: 2022, model: 'BMW X4M', damage: 'Fire', status: 'Open', currentBid: '5,000 $' },
-  { year: 2022, model: 'BMW X4M', damage: 'Flood', status: 'Open', currentBid: 'Start the bidding' },
-  { year: 2022, model: 'BMW X4M', damage: 'Flood', status: 'Open', currentBid: 'Start the bidding' },
-  { year: 2022, model: 'BMW X4M', damage: 'Flood', status: 'Open', currentBid: 'Start the bidding' },
-  { year: 2022, model: 'BMW X4M', damage: 'None', status: 'Close', currentBid: '250,000 $' },
-  { year: 2022, model: 'BMW X4M', damage: 'Fire', status: 'Open', currentBid: '5,000 $' },
-];
-
 export default function FavoritePage() {
+  const [favorites, setFavorites] = useState([]); // สร้าง state สำหรับเก็บข้อมูล favorite
   const [sortOption, setSortOption] = useState(null);
   const [isSortingMenuOpen, setIsSortingMenuOpen] = useState(false);
 
+  // ฟังก์ชันสำหรับการดึงข้อมูลจาก Backend
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const response = await axios.get('http://localhost:9500/favorites'); // ดึงข้อมูลจาก Backend
+        setFavorites(response.data); // เก็บข้อมูลลงใน state
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+      }
+    };
+
+    fetchFavorites(); // เรียกใช้ฟังก์ชันดึงข้อมูล
+  }, []);
+
   // ฟังก์ชันสำหรับการจัดเรียง
   const getSortedCars = () => {
-    let sortedCars = [...cars]; // Copy the cars array
+    let sortedCars = [...favorites]; // Copy the favorites array
 
     switch (sortOption) {
       case 'Year Ascending':
@@ -56,13 +61,13 @@ export default function FavoritePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-happy">
-        <div>
-            <Navbar />
-        </div>
+      <div>
+        <Navbar />
+      </div>
       <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Favourite(8)</h1>
-          
+          <h1 className="text-3xl font-bold text-gray-900">Favourite ({favorites.length})</h1>
+
           <div className="relative">
             <button
               onClick={() => setIsSortingMenuOpen(!isSortingMenuOpen)}
@@ -102,13 +107,13 @@ export default function FavoritePage() {
             )}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedCars.map((car, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
                 className="w-full h-48 object-cover"
-                src="https://via.placeholder.com/400x250"
+                src={car.image || "https://via.placeholder.com/400x250"} // ใช้ภาพจาก Backend หรือภาพ default
                 alt={`Car ${car.year} ${car.model}`}
               />
               <div className="p-4">

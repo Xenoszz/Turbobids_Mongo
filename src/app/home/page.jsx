@@ -49,38 +49,6 @@ function page() {
           </div>
           </div>
 
-        <div className="flex justify-center gap-20 mt-12 mb-24">
-        <CarCard
-          carImage="https://via.placeholder.com/400x300?text=Car+Image"
-          carModel="Toyota Camry 2020"
-          status="Bidding"
-          countdownTime={3600}
-          detailsLink="/car-details/1"
-        />
-        <CarCard
-          carImage="https://via.placeholder.com/400x300?text=Car+Image"
-          carModel="Honda Accord 2021"
-          status="Closed"
-          countdownTime={1800}
-          detailsLink="/car-details/2"
-        />
-        <CarCard
-          carImage="https://via.placeholder.com/400x300?text=Car+Image"
-          carModel="BMW 3 Series 2022"
-          status="Bidding"
-          countdownTime={5400}
-          detailsLink="/car-details/3"
-        />
-        <CarCard
-          carImage="https://via.placeholder.com/400x300?text=Car+Image"
-          carModel="Audi A4 2021"
-          status="Bidding"
-          countdownTime={7200}
-          detailsLink="/car-details/4"
-        />
-      </div>
-
-
           <div className='flex justify-center bg-[#2A2F6E] rounded-3xl mt-10 mb-10 ml-40 mr-40'>
             <div className='bg-white mt-8 mb-8 ml-6 px-6 py-4 rounded-3xl flex-col flex-1'>
                 <h2>What is Turbobids? </h2>
