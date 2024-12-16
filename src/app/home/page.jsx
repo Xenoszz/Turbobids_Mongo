@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -9,10 +9,15 @@ import { CarSearchForm } from "../components/Car_Home/CarSearchForm";
 import { SearchButton } from "../components/Car_Home/SearchButton";
 import '../globals.css';
 import { Star } from 'lucide-react';
+import axios from 'axios';
+
 
 function page() {
   
   const scrollRef = useRef(null);
+  const [cars, setCars] = useState([]);
+  const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState({});
 
   const scroll = (direction) => {
     const container = scrollRef.current;
@@ -25,6 +30,32 @@ function page() {
 
   const handleSearch = () => {
     console.log({ brand, type, model, color });
+  };
+
+    // Fetch data from the API when the component mounts
+    useEffect(() => {
+      axios
+        .post('http://localhost:9500/cars') // API URL of your Express backend
+        .then((response) => {
+          setCars(response.data); // Set the fetched data into state
+        })
+        .catch((err) => {
+          setError('เกิดข้อผิดพลาดในการดึงข้อมูล'); // Set error message if there's an error
+        });
+    }, []);
+
+  // Sort cars by rating in descending order (highest rating first)
+  const sortedCars = cars.sort((a, b) => b.rating - a.rating);
+
+  // Slice the first 4 cars
+  const topCars = sortedCars.slice(0, 4);
+
+  
+  const handleFavoriteToggle = (car_ID, isFavorited) => {
+    setFavorites((prev) => ({
+      ...prev,
+      [car_ID]: isFavorited,
+    }));
   };
 
   return (
@@ -48,6 +79,22 @@ function page() {
               <SearchButton onClick={handleSearch} />
           </div>
           </div>
+
+        <div className="flex justify-center gap-20 mt-12 mb-24">
+        {topCars.map((car) => (
+        <CarCard
+          key={car.car_ID} // Use unique car ID as key
+          carImage={`https://via.placeholder.com/400x300?text=Car+Image`} // Placeholder image
+          carModel={`${car.car_brand} ${car.car_model} ${car.car_rear}`} // Car model info
+          status={"Current Bid : Start the bidding"} // Assuming you have a status field in the car data
+          countdownTime={3600} // Set your countdown time dynamically if needed
+          detailsLink={`/car-details/${car.car_ID}`} // Link to car details page
+          car_ID={car.car_ID}
+          onFavoriteToggle={handleFavoriteToggle}
+        />
+      ))}
+    </div>
+
 
           <div className='flex justify-center bg-[#2A2F6E] rounded-3xl mt-10 mb-10 ml-40 mr-40'>
             <div className='bg-white mt-8 mb-8 ml-6 px-6 py-4 rounded-3xl flex-col flex-1'>

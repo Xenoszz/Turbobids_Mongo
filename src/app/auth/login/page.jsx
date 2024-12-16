@@ -14,7 +14,7 @@ function LoginPage() {
     const router = useRouter();
 
     useEffect(() => {
-        checkAuth();
+        // checkAuth();
     }, []);
 
     const handleSubmit = async (e) => {
@@ -44,26 +44,6 @@ function LoginPage() {
     //     } 
     // };
 
-    // const checkAuth = async () => {
-    //     try {
-    //         const res = await fetch("http://localhost:5000/api/protected", {
-    //             method: "GET",
-    //             credentials: "include", // เพื่อส่ง Cookie
-    //         });
-
-    //         const data = await res.json();
-    //         if (res.ok) {
-    //             console.log("User authenticated:", data.user);
-    //             // หากผู้ใช้ยืนยันตัวตนแล้ว, redirect ไปยังหน้า home หรือหน้าอื่นที่ต้องการ
-    //             router.push('/home');
-    //         } else {
-    //             console.log("Authentication failed");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error verifying auth:", error);
-    //     }
-    // };
-
         //Sql
         try {
             const res = await fetch("http://localhost:9500/api/auth/login", {
@@ -72,12 +52,20 @@ function LoginPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ email: email, password }), // ส่งข้อมูลไปที่ API
-                credentials: 'include',
+                credentials: 'include', // ส่งคุกกี้ (ถ้าจำเป็น)
             });
-
-            const data = await res.json();
+        
+            const data = await res.json(); // รอให้ response กลับมาในรูปแบบ JSON
+        
             if (res.ok) {
-
+                // ถ้า login สำเร็จ และมี token ใน response
+                const token = data.token; // ดึง token จาก data ที่ได้รับ
+                console.log('Received token:', token);
+        
+                // เก็บ token ใน localStorage หรือ sessionStorage
+                localStorage.setItem('token', token);
+        
+                // รีไดเรกต์ไปหน้า home
                 router.push('/home');
             } else {
                 // ถ้าเกิดข้อผิดพลาด, แสดงข้อความผิดพลาด
@@ -86,29 +74,11 @@ function LoginPage() {
         } catch (error) {
             console.log(error);
             seterror("An error occurred during login.");
-        } 
-    };
-
-    const checkAuth = async () => {
-        try {
-            const res = await fetch("http://localhost:9500/api/protected", {
-                method: "GET",
-                credentials: "include", // เพื่อส่ง Cookie
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                console.log("User authenticated:", data.user);
-                // หากผู้ใช้ยืนยันตัวตนแล้ว, redirect ไปยังหน้า home หรือหน้าอื่นที่ต้องการ
-                router.push('/home');
-            } else {
-                console.log("Authentication failed");
-            }
-        } catch (error) {
-            console.error("Error verifying auth:", error);
         }
+        
     };
-    
+
+
 
 
 

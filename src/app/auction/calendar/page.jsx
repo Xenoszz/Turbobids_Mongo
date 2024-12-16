@@ -5,55 +5,18 @@ import Footer from "../../components/Footer";
 import "../../globals.css";
 
 const Auctions = () => {
-  const [currentPage, setCurrentPage] = useState(1); // เก็บเลขหน้าปัจจุบัน
-  const [cars, setCars] = useState([]); // เก็บข้อมูลรถยนต์
-  const itemsPerPage = 3; // จำนวนรถที่จะแสดงต่อหน้า
+  const [cars, setCars] = useState([]); // เก็บข้อมูลรถยนต์ทั้งหมด
 
-  // จำลองการดึงข้อมูลจาก API (อัปเดตข้อมูลใหม่ตามหน้าปัจจุบัน)
-  const fetchCars = async (page) => {
-    const allCars = [
-      {
-        id: `CAR-${page}1`,
-        brand: "BMW",
-        model: "X4M",
-        year: "2023",
-        startingPrice: "10,000 $",
-        date: `Page ${page} - Date 1`,
-        image: "/IMG/byd.JPG",
-      },
-      {
-        id: `CAR-${page}2`,
-        brand: "Audi",
-        model: "Q5",
-        year: "2022",
-        startingPrice: "9,000 $",
-        date: `Page ${page} - Date 2`,
-        image: "/IMG/byd.JPG",
-      },
-      {
-        id: `CAR-${page}3`,
-        brand: "Mercedes",
-        model: "GLC",
-        year: "2021",
-        startingPrice: "12,000 $",
-        date: `Page ${page} - Date 3`,
-        image: "/IMG/byd.JPG",
-      },
-    ];
-    return new Promise((resolve) => setTimeout(() => resolve(allCars), 500));
-  };
-
+  // ดึงข้อมูลทั้งหมดจาก API เมื่อโหลดคอมโพเนนต์
   useEffect(() => {
     const loadCars = async () => {
-      const data = await fetchCars(currentPage);
-      setCars(data);
+      // สมมติว่าคุณดึงข้อมูลจาก API ผ่าน fetch หรือ axios
+      const response = await fetch('http://localhost:9500/api/calendar'); // เปลี่ยนเป็น URL ที่ดึงข้อมูลจาก API ของคุณ
+      const data = await response.json();
+      setCars(data); // เก็บข้อมูลใน state
     };
     loadCars();
-  }, [currentPage]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  }, []); // useEffect จะทำงานแค่ครั้งเดียวเมื่อโหลดคอมโพเนนต์
 
   return (
     <div className="bg-gray-100 min-h-screen font-happy">
@@ -75,7 +38,7 @@ const Auctions = () => {
               className="bg-white shadow-md rounded-3xl overflow-hidden flex flex-col md:flex-row"
             >
               {/* รูปภาพ */}
-              <img src={car.image} alt={car.model} className="w-full md:w-1/3 object-cover" />
+              <img src={car.image} alt={car.car_model} className="w-full md:w-1/3 object-cover" />
 
               {/* ข้อมูลรถ */}
               <div className="relative p-4 flex-1">
@@ -85,23 +48,23 @@ const Auctions = () => {
                     {/* Left Group */}
                     <div className="w-1/2">
                       <p>
-                        <strong>Brand:</strong> {car.brand}
+                        <strong>Brand:</strong> {car.car_brand}
                       </p>
                       <p>
-                        <strong>Model:</strong> {car.model}
+                        <strong>Model:</strong> {car.car_model}
                       </p>
                       <p>
-                        <strong>Year:</strong> {car.year}
+                        <strong>Year:</strong> {car.car_year}
                       </p>
                     </div>
 
                     {/* Right Group */}
                     <div className="w-1/2 pl-4">
                       <p>
-                        <strong>Car ID:</strong> {car.id}
+                        <strong>Car ID:</strong> {car.car_ID}
                       </p>
                       <p>
-                        <strong>Starting Price:</strong> {car.startingPrice}
+                        <strong>Starting Price: $</strong> {car.auction_starting_price}
                       </p>
                     </div>
                   </div>
@@ -113,43 +76,6 @@ const Auctions = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-center items-center mt-6 space-x-2">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-2 py-1 text-gray-500 hover:text-gray-700 ${
-              currentPage === 1 ? "text-gray-300 cursor-not-allowed" : ""
-            }`}
-          >
-            &laquo;
-          </button>
-          {Array(5)
-            .fill()
-            .map((_, i) => (
-              <button
-                key={i}
-                onClick={() => handlePageChange(i + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === i + 1
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === 5}
-            className={`px-2 py-1 text-gray-500 hover:text-gray-700 ${
-              currentPage === 5 ? "text-gray-300 cursor-not-allowed" : ""
-            }`}
-          >
-            &raquo;
-          </button>
         </div>
       </div>
       <Footer />

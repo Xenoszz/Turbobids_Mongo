@@ -1,73 +1,68 @@
-'use client';
-
+"use client"
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // ใช้ axios ในการดึงข้อมูลจาก Backend
+import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../globals.css';
+import { getUserIdFromToken } from '@/app/utils/auth';  // ดึงฟังก์ชัน decodeToken
 
 export default function FavoritePage() {
-  const [favorites, setFavorites] = useState([]); // สร้าง state สำหรับเก็บข้อมูล favorite
+  const [favorites, setFavorites] = useState([]);
   const [sortOption, setSortOption] = useState(null);
   const [isSortingMenuOpen, setIsSortingMenuOpen] = useState(false);
+  const userID = getUserIdFromToken(); // ดึง user_id ออกจาก token
 
-  // ฟังก์ชันสำหรับการดึงข้อมูลจาก Backend
+
+
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await axios.get('http://localhost:9500/favorites'); // ดึงข้อมูลจาก Backend
-        setFavorites(response.data); // เก็บข้อมูลลงใน state
+        const response = await axios.post('http://localhost:9500/showfavorite', {
+          userID: userID, // ส่ง userID ใน body
+        });
+        setFavorites(response.data);
       } catch (error) {
         console.error("Error fetching favorites:", error);
       }
     };
 
-    fetchFavorites(); // เรียกใช้ฟังก์ชันดึงข้อมูล
-  }, []);
+    if (userID) {
+      fetchFavorites();
+    }
+  }, [userID]);
 
-  // ฟังก์ชันสำหรับการจัดเรียง
+  // ฟังก์ชันจัดเรียงรถ
   const getSortedCars = () => {
-    let sortedCars = [...favorites]; // Copy the favorites array
+    let sortedCars = [...favorites];
 
     switch (sortOption) {
       case 'Year Ascending':
-        sortedCars.sort((a, b) => a.year - b.year);
+        sortedCars.sort((a, b) => a.car_year - b.car_year);
         break;
       case 'Year Descending':
-        sortedCars.sort((a, b) => b.year - a.year);
+        sortedCars.sort((a, b) => b.car_year - a.car_year);
         break;
-      case 'Current Bid Ascending':
-        sortedCars.sort((a, b) => {
-          const bidA = a.currentBid === 'Start the bidding' ? 0 : parseFloat(a.currentBid.replace(/[^\d.-]/g, ''));
-          const bidB = b.currentBid === 'Start the bidding' ? 0 : parseFloat(b.currentBid.replace(/[^\d.-]/g, ''));
-          return bidA - bidB;
-        });
+      case 'Price Ascending':
+        sortedCars.sort((a, b) => parseFloat(a.car_price) - parseFloat(b.car_price));
         break;
-      case 'Current Bid Descending':
-        sortedCars.sort((a, b) => {
-          const bidA = a.currentBid === 'Start the bidding' ? 0 : parseFloat(a.currentBid.replace(/[^\d.-]/g, ''));
-          const bidB = b.currentBid === 'Start the bidding' ? 0 : parseFloat(b.currentBid.replace(/[^\d.-]/g, ''));
-          return bidB - bidA;
-        });
+      case 'Price Descending':
+        sortedCars.sort((a, b) => parseFloat(b.car_price) - parseFloat(a.car_price));
         break;
       default:
-        break; // Default, no sorting
+        break;
     }
 
     return sortedCars;
   };
 
-  const sortedCars = getSortedCars(); // Calculate sorted cars only when needed
+  const sortedCars = getSortedCars();
 
   return (
     <div className="min-h-screen bg-gray-50 font-happy">
-      <div>
-        <Navbar />
-      </div>
+      <Navbar />
       <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Favourite ({favorites.length})</h1>
-
           <div className="relative">
             <button
               onClick={() => setIsSortingMenuOpen(!isSortingMenuOpen)}
@@ -75,65 +70,55 @@ export default function FavoritePage() {
             >
               Sorting
             </button>
-
-            {/* Dropdown เมนูการจัดเรียง */}
             {isSortingMenuOpen && (
               <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg w-48">
                 <button
-                  onClick={() => setSortOption('Year Ascending')}
+                  onClick={() => { setSortOption('Year Ascending'); setIsSortingMenuOpen(false); }}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Year Ascending
                 </button>
                 <button
-                  onClick={() => setSortOption('Year Descending')}
+                  onClick={() => { setSortOption('Year Descending'); setIsSortingMenuOpen(false); }}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Year Descending
                 </button>
                 <button
-                  onClick={() => setSortOption('Current Bid Ascending')}
+                  onClick={() => { setSortOption('Price Ascending'); setIsSortingMenuOpen(false); }}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
-                  Current Bid Ascending
+                  Price Ascending
                 </button>
                 <button
-                  onClick={() => setSortOption('Current Bid Descending')}
+                  onClick={() => { setSortOption('Price Descending'); setIsSortingMenuOpen(false); }}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
-                  Current Bid Descending
+                  Price Descending
                 </button>
               </div>
             )}
           </div>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedCars.map((car, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
                 className="w-full h-48 object-cover"
-                src={car.image || "https://via.placeholder.com/400x250"} // ใช้ภาพจาก Backend หรือภาพ default
-                alt={`Car ${car.year} ${car.model}`}
+                src={car.image || "https://via.placeholder.com/400x250"}
+                alt={`Car ${car.car_year} ${car.car_model}`}
               />
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900">{`${car.year} ${car.model}`}</h3>
-                <p className="text-sm text-gray-500">Damage: {car.damage}</p>
-                <p className="text-sm text-gray-500">Status: {car.status}</p>
-                <p className="text-lg font-semibold text-gray-900">Current Bid: {car.currentBid}</p>
-              </div>
-              <div className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md">
-                <svg className="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
+                <h3 className="text-lg font-semibold text-gray-900">{`${car.car_year} ${car.car_brand} ${car.car_model}`}</h3>
+                <p className="text-sm text-gray-500">Details: {car.car_details}</p>
+                <p className="text-sm text-gray-500">Status: {car.car_status}</p>
+                <p className="text-lg font-semibold text-gray-900">Current Bid: {car.car_price} $</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className='py-4'>
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 }

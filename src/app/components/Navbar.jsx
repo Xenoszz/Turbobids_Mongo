@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '../globals.css';
 import { useRouter } from "next/navigation";
+import { decodeToken } from '@/app/utils/auth';  
 
 export function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -10,81 +11,41 @@ export function Navbar() {
   const router = useRouter();
   const dropdownRef = useRef(null);
 
-
-  //ตรวจสอบสถานะการล็อกอิน
+  // ตรวจสอบ token ทุกครั้งที่คอมโพเนนต์โหลด
   useEffect(() => {
-    //Mongo
-//     const checkAuth = async () => {
-//       try {
-//         const res = await fetch('http://localhost:5000/api/protected', {
-//           method: 'GET',
-//           credentials: 'include',
-//         });
-
-//         if (res.ok) {
-//           const data = await res.json();
-//           console.log('User authenticated:', data.user);
-//           setIsAuthenticated(true);
-//         } else {
-//           console.log('Authentication failed');
-//           setIsAuthenticated(false);
-//         }
-//       } catch (error) {
-//         console.error('Error verifying auth:', error);
-//         setIsAuthenticated(false);
-//       }
-//     };
-// }, []);
-
-    //Sql
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('http://localhost:9500/api/protected', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          console.log('User authenticated:', data.user);
-          setIsAuthenticated(true);
-        } else {
-          console.log('Authentication failed');
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Error verifying auth:', error);
-        setIsAuthenticated(false);
+    const checkToken = () => {
+      const decoded = decodeToken();  // ใช้ decodeToken เพื่อดึงข้อมูล token
+      if (decoded) {
+        console.log('Token decoded:', decoded);
+        setIsAuthenticated(true);  // ถ้ามี token หรือ token ยังไม่หมดอายุ
+      } else {
+        console.log('No valid token');
+        setIsAuthenticated(false);  // ไม่มี token หรือ token หมดอายุ
       }
     };
-    checkAuth();
-  }, []);
+    
+    checkToken();
+  }, []);  // ใช้ [] เพื่อให้ useEffect ทำงานแค่ครั้งเดียวเมื่อคอมโพเนนต์โหลด
 
+  // ฟังก์ชันที่ใช้ในการนำทาง
   const handleNavigation = (path) => {
     if (isAuthenticated) {
-      router.push(path);
+      router.push(path); // ถ้า user authentication ผ่าน, ไปที่ path ที่กำหนด
     } else {
-      // router.push('/auth/login');
-      router.push(path); //Bypass
-      
+      router.push('/auth/login'); // ถ้า user ยังไม่เข้าสู่ระบบ, ไปหน้า login
     }
   };
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
+  // ฟังก์ชันจัดการ dropdown visibility
   const toggleDropdown = (menu) => {
     setDropdownVisible((prev) => (prev === menu ? null : menu)); // เปิด/ปิด dropdown
   };
 
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setDropdownVisible(null);
-    }
+  // ฟังก์ชันจัดการการออกจากระบบ (Sign Out)
+  const handleSignOut = () => {
+    localStorage.removeItem('token'); // ลบ token
+    setIsAuthenticated(false); // อัปเดตสถานะการล็อกอิน
+    router.push('/auth/login'); // ไปหน้า login
   };
 
   return (
@@ -166,35 +127,35 @@ export function Navbar() {
           </div>
         </div>
         <div ref={dropdownRef} className="flex items-center ml-auto">
-        {isAuthenticated && (
-          <div className="flex items-center ml-auto relative">
-            <div className="relative">
-              <button onClick={() => toggleDropdown('notifications')} className="mr-4 hover:text-orange-400">
-                <img src="/IMG/Noti.png" alt="Notifications" className="h-12 w-12" />
-              </button>
-              {dropdownVisible === 'notifications' && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 text-black rounded-md shadow-md p-4 z-20">
-                  <h3 className="font-bold">Latest notification</h3>
-                  {/* รายการ Notification */}
-                  <div>Your notifications here...</div>
-                </div>
-              )}
+          {isAuthenticated && (
+            <div className="flex items-center ml-auto relative">
+              <div className="relative">
+                <button onClick={() => toggleDropdown('notifications')} className="mr-4 hover:text-orange-400">
+                  <img src="/IMG/Noti.png" alt="Notifications" className="h-12 w-12" />
+                </button>
+                {dropdownVisible === 'notifications' && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 text-black rounded-md shadow-md p-4 z-20">
+                    <h3 className="font-bold">Latest notification</h3>
+                    {/* รายการ Notification */}
+                    <div>Your notifications here...</div>
+                  </div>
+                )}
+              </div>
+              <div className="relative">
+                <button onClick={() => toggleDropdown('profile')} className="hover:text-orange-400">
+                  <img src="/IMG/Profile.png" alt="Profile" className="h-12 w-12" />
+                </button>
+                {dropdownVisible === 'profile' && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 text-black rounded-md shadow-md p-4 z-20">
+                    <h3 className="font-bold">Profile</h3>
+                    <button onClick={() => handleNavigation('/account')} className="block px-4 py-2 hover:bg-gray-200">Account</button>
+                    <button onClick={() => handleNavigation('/settings')} className="block px-4 py-2 hover:bg-gray-200">Setting</button>
+                    <button onClick={handleSignOut} className="block mt-2 px-4 py-2 bg-red-500 text-white rounded-md">Sign Out</button>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="relative">
-              <button onClick={() => toggleDropdown('profile')} className="hover:text-orange-400">
-                <img src="/IMG/Profile.png" alt="Profile" className="h-12 w-12" />
-              </button>
-              {dropdownVisible === 'profile' && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 text-black rounded-md shadow-md p-4 z-20">
-                  <h3 className="font-bold">Profile</h3>
-                  <button onClick={() => handleNavigation('/account')} className="block px-4 py-2 hover:bg-gray-200">Account</button>
-                  <button onClick={() => handleNavigation('/settings')} className="block px-4 py-2 hover:bg-gray-200">Setting</button>
-                  <button onClick={() => { router.push('/auth/signout'); }} className="block mt-2 px-4 py-2 bg-red-500 text-white rounded-md">Sign Out</button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          )}
         </div>
       </div>
     </nav>
