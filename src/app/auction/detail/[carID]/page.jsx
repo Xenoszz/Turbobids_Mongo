@@ -6,6 +6,7 @@ import Footer from "../../../components/Footer";
 import { useParams, useRouter } from "next/navigation";
 import { getUserIdFromToken } from '@/app/utils/auth';
 
+
 const VehicleDetail = () => {
   const [car, setCar] = useState(null);
   const [history, setHistory] = useState([]);
@@ -16,8 +17,9 @@ const VehicleDetail = () => {
   const [isAuctionEnded, setIsAuctionEnded] = useState(false); // State to track auction status
   const [bidStatus, setBidStatus] = useState("Open"); // Track bid status
   const params = useParams();
-  const userID = getUserIdFromToken(); // ดึง user_id ออกจาก token
+  const userID = getUserIdFromToken(); 
   const router = useRouter();
+  
 
   useEffect(() => {
     if (!params.carID) return;
@@ -44,16 +46,42 @@ const VehicleDetail = () => {
 
   useEffect(() => {
     if (!car || !car.auction_end_date) return;
+
+    let auctionEndDate = car.auction_end_date;
+    if (auctionEndDate.includes('T')) {
+      auctionEndDate = auctionEndDate.split('T')[0];
+    }
+    if (auctionEndDate.includes('Z')) {
+      auctionEndDate = auctionEndDate.replace('Z', '');
+    }
   
 
-    // ตรวจสอบว่าการประมูลสิ้นสุดหรือยัง
-    const auctionEndDate = new Date(car.auction_end_date);
-    console.log(auctionEndDate);
+    let auctionEndTime = car.auction_end_time;
+    if (auctionEndTime.includes('T')) {
+      auctionEndTime = auctionEndTime.replace('T', '');
+    }
+    if (auctionEndTime.includes('Z')) {
+      auctionEndTime = auctionEndTime.replace('Z', '');
+    }
+
+    const auctionEndDateTimeString = `${auctionEndDate}T${auctionEndTime}`;
+    console.log('Auction End Date and Time:', auctionEndDateTimeString);
   
-    const now = new Date(); 
-    if (auctionEndDate <= now) {
+
+    const auctionEndDateTime = new Date(auctionEndDateTimeString);
+    console.log('Auction End DateTime Object:', auctionEndDateTime);
+  
+    // เพิ่ม 1 วันเข้าไปใน Date object
+    auctionEndDateTime.setDate(auctionEndDateTime.getDate() + 1);
+  
+    
+    const now = new Date();
+    console.log('Current Date and Time:', now);
+    
+    // เปรียบเทียบเวลาปัจจุบันกับเวลาสิ้นสุดการประมูล
+    if (now >= auctionEndDateTime) {
       setBidStatus("Closed");
-      setIsAuctionEnded(true); 
+      setIsAuctionEnded(true);
       setTimeLeft("00:00:00");
       return; // การประมูลสิ้นสุดแล้ว ไม่ต้องตั้งค่าตัวนับเวลา
     }
@@ -116,9 +144,26 @@ const VehicleDetail = () => {
     }
   };
 
-  const handleCompleteAuction = () => {
-    // Navigate to another page after the auction is completed
-    router.push('/auction/completed'); // Modify the URL as needed
+  const handleCompleteAuction = async () => {
+    try {
+      const carID = params.carID;
+      const response = await axios.post(`http://localhost:9500/api/completeAuction`,{ carID, userID } );
+      const data = response.data;
+
+  
+      if (data.success) {
+        // ผู้ใช้ปัจจุบันเป็นผู้ประมูลสูงสุด
+        alert(data.message || "Complete");
+        router.push('/auction/completed'); // เปลี่ยน URL ตามต้องการ
+      } else {
+        // ผู้ใช้ปัจจุบันไม่ใช่ผู้ประมูลสูงสุด หรือเกิดข้อผิดพลาด
+        alert(data.message || "เกิดข้อผิดพลาด");
+        router.back(); // ย้อนกลับไปหน้าก่อนหน้า (ถ้าต้องการ)
+      }
+    } catch (error) {
+      console.error("Error completing auction:", error);
+      alert("เกิดข้อผิดพลาดในการตรวจสอบผู้ประมูลสูงสุด");
+    }
   };
 
   if (loading) return <div>Loading...</div>;

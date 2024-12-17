@@ -4,13 +4,13 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../globals.css';
-import { getUserIdFromToken } from '@/app/utils/auth';  // ดึงฟังก์ชัน decodeToken
+import { getUserIdFromToken } from '@/app/utils/auth';  
 
 export default function FavoritePage() {
   const [favorites, setFavorites] = useState([]);
   const [sortOption, setSortOption] = useState(null);
   const [isSortingMenuOpen, setIsSortingMenuOpen] = useState(false);
-  const userID = getUserIdFromToken(); // ดึง user_id ออกจาก token
+  const userID = getUserIdFromToken(); 
 
 
 
