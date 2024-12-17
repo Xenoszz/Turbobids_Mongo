@@ -105,19 +105,19 @@ export function Navbar() {
             {dropdownVisible === 'support' && (
               <div className="absolute top-full left-0 bg-white text-black rounded-md shadow-md p-2 z-20">
                 <button
-                  onClick={() => handleNavigation('/support/how-it-works')}
+                  onClick={() => handleNavigation('/support/HowTurboBidswork')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   How TurboBids work
                 </button>
                 <button
-                  onClick={() => handleNavigation('/support/faq')}
+                  onClick={() => handleNavigation('/support/CommonQuession')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Common Questions
                 </button>
                 <button
-                  onClick={() => handleNavigation('/support/terms')}
+                  onClick={() => handleNavigation('/support/TermsofService')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Terms of Service
@@ -149,7 +149,6 @@ export function Navbar() {
                   <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 text-black rounded-md shadow-md p-4 z-20">
                     <h3 className="font-bold">Profile</h3>
                     <button onClick={() => handleNavigation('/account')} className="block px-4 py-2 hover:bg-gray-200">Account</button>
-                    <button onClick={() => handleNavigation('/settings')} className="block px-4 py-2 hover:bg-gray-200">Setting</button>
                     <button onClick={handleSignOut} className="block mt-2 px-4 py-2 bg-red-500 text-white rounded-md">Sign Out</button>
                   </div>
                 )}

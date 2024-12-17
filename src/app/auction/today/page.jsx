@@ -15,35 +15,51 @@ export default function Home() {
   useEffect(() => {
     axios.get('http://localhost:9500/api/Todayauctions')
       .then(response => {
-        setAuctions(response.data); // Set auction data
+        // Filter the data to only show today's auctions
+        const today = new Date().setHours(0, 0, 0, 0); // Get today's date at midnight
+
+        // Filter auctions to show only those with today's date
+        const todayAuctions = response.data.filter((auction) => {
+          const auctionDate = new Date(auction.auction_start_date).setHours(0, 0, 0, 0);
+          return auctionDate === today;
+        });
+
+        setAuctions(todayAuctions); // Set filtered auction data
       })
       .catch(error => {
         console.error("Error fetching auction data:", error);
       });
   }, []); // This runs once when the component mounts
 
-// Fetch auction data based on search term
-useEffect(() => {
-  if (searchTerm.length > 0) {
-    // Fetch auction data for the search term
-    axios.get(`http://localhost:9500/api/TodaySearch`, {
-      params: { searchTerm } // ส่ง searchTerm เป็น query parameter
-    })
-      .then(response => {
-        setAuctions(response.data); // Set auction data
+  // Fetch auction data based on search term
+  useEffect(() => {
+    if (searchTerm.length > 0) {
+      // Fetch auction data for the search term
+      axios.get(`http://localhost:9500/api/TodaySearch`, {
+        params: { searchTerm } // ส่ง searchTerm เป็น query parameter
       })
-      .catch(error => {
-        console.error("Error fetching auction data:", error);
-      });
-  } else {
-    // Clear auctions if no search term is provided
-    setAuctions([]);
-  }
-}, [searchTerm]); // This runs every time the search term changes
+        .then(response => {
+          // Filter the data to only show today's auctions based on the search term
+          const today = new Date().setHours(0, 0, 0, 0); // Get today's date at midnight
+          const todayAuctions = response.data.filter((auction) => {
+            const auctionDate = new Date(auction.auction_start_date).setHours(0, 0, 0, 0);
+            return auctionDate === today;
+          });
+          setAuctions(todayAuctions); // Set filtered auction data
+        })
+        .catch(error => {
+          console.error("Error fetching auction data:", error);
+        });
+    } else {
+      // If no search term is provided, clear auctions
+      setAuctions([]);
+    }
+  }, [searchTerm]); // This runs every time the search term changes
 
-const handleBidNow = (carID) => {
-  router.push(`/auction/detail/${carID}`);  // Navigate to the details page with the carID
-};
+
+  const handleBidNow = (carID) => {
+    router.push(`/auction/detail/${carID}`);  // Navigate to the details page with the carID
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 font-happy">
@@ -63,6 +79,7 @@ const handleBidNow = (carID) => {
             value={searchTerm}  // Bind input field to state
             onChange={(e) => setSearchTerm(e.target.value)} // Update search term on input change
           />
+          
         </div>
       </div>
 
@@ -71,7 +88,7 @@ const handleBidNow = (carID) => {
         {/* Check if there are any auctions */}
         {auctions.length === 0 ? (
           <div className="text-center text-2xl text-gray-700 font-bold mt-8 bg-white rounded-3xl p-4">
-            No auctions found matching your search.
+            No auctions found for today.
           </div>
         ) : (
           auctions.map((auction) => (
@@ -80,7 +97,7 @@ const handleBidNow = (carID) => {
               className="relative flex flex-col bg-white shadow-lg rounded-3xl p-4"
             >
               {/* Date */}
-              <div className="text-sm font-bold text-gray-700 mb-2">
+              <div className="text-xl font-bold text-gray-700 mb-2">
                 {auction.formatted_auction_start_date}
               </div>
 
@@ -90,7 +107,7 @@ const handleBidNow = (carID) => {
                 <img
                   src="/IMG/byd.JPG"  // Replace with auction-specific car image URL
                   alt="Car"
-                  className="w-1/2 h-1/2 object-cover rounded-md"
+                  className="w-1/3 h-1/2 object-cover rounded-md"
                 />
 
                 {/* Text Section */}
@@ -105,7 +122,7 @@ const handleBidNow = (carID) => {
                     </div>
 
                     {/* Right Group */}
-                    <div className="text-left">
+                    <div className="text-left mr-24">
                       <p><strong>Sale Highlights:</strong> {auction.car_details}</p>
                       <p><strong>Sale Time:</strong> {auction.formatted_auction_start_time}</p>
                       <p><strong>Current Bid:</strong> ${auction.auction_current_price}</p>

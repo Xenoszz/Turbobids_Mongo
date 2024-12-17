@@ -101,9 +101,6 @@ const VehicleDetail = () => {
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6">
         <div className="mb-4">
           <h1 className="text-2xl font-bold">{car?.car_brand} {car?.car_model}</h1>
-          <p className="text-sm text-gray-500">
-          Home &gt; Search Results &gt; {car.car_brand} &gt; {car.car_model} {car.car_year}
-          </p>
         </div>
 
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
@@ -116,12 +113,6 @@ const VehicleDetail = () => {
                   className="w-full h-64 object-cover rounded-md"
                 />
               )}
-              <div className="absolute top-1/2 left-2 bg-gray-200 p-2 rounded-full">
-                &#8592;
-              </div>
-              <div className="absolute top-1/2 right-2 bg-gray-200 p-2 rounded-full">
-                &#8594;
-              </div>
             </div>
 
             <div className="flex gap-2 overflow-x-auto">
@@ -161,7 +152,6 @@ const VehicleDetail = () => {
               <p className="text-sm mt-2">
                 Bid Status: <span className="text-green-500">{car?.bid_status}</span>
               </p>
-              <p className="text-sm">Sale Status: {car?.sale_status}</p>
               <p className="text-sm text-red-500">Time Left: {timeLeft}</p>
               <p className="text-sm">
                 Current Bid: <span className="font-bold">{car?.current_bid} USD</span>
@@ -188,16 +178,19 @@ const VehicleDetail = () => {
         <div className="bg-white p-4 rounded-md shadow mt-6">
           <h2 className="text-lg font-semibold border-b pb-2">History Bid</h2>
           <ul className="text-sm mt-2 space-y-2">
-            {history.length > 0 ? (
-              history.slice(-4).reverse().map((bid) => (
-                <li key={bid.history_id}>
-                  <span className="font-medium">User ID: {bid.firstname} </span>
-                  offered <span className="font-bold">{bid.bid_amount} USD</span> on {new Date(bid.bid_time).toLocaleString()}
-                </li>
-              ))
-            ) : (
-              <li>No bid history available.</li>
-            )}
+          {history.length > 0 ? (
+          history
+            .sort((a, b) => b.bid_amount - a.bid_amount) // เรียงจากมากไปหาน้อย
+            .slice(0, 4) // เลือก 4 รายการล่าสุดหลังจากเรียง
+            .map((bid) => (
+      <li key={bid.history_id}>
+        <span className="font-medium">User ID: {bid.Username} </span>
+        offered <span className="font-bold">{bid.bid_amount} USD</span> on {new Date(bid.bid_time).toLocaleString()}
+      </li>
+            ))
+          ) : (
+            <li>No bid history available.</li>
+          )}
           </ul>
         </div>
       </main>

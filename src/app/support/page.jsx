@@ -3,8 +3,8 @@
 import React, { useRef } from 'react';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import "../globals.css";
 
-import '../globals.css';
 
 
 function page() {
@@ -17,7 +17,7 @@ function page() {
         <Navbar />
       </div>
 
-
+    test
       <div>
         <Footer />
       </div>
