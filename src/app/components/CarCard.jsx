@@ -16,12 +16,6 @@ const CarCard = ({
   const [isFavorited, setIsFavorited] = useState(false); // สถานะสำหรับ Favorite
   const userID = getUserIdFromToken(); // ดึง user_id ออกจาก token
 
-  // ฟังก์ชันแปลงเวลาเป็นนาที:วินาที
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
-  };
 
   const userToken = localStorage.getItem('token');
 
@@ -83,15 +77,6 @@ const CarCard = ({
     }
   };
 
-  // นับเวลาถอยหลัง
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
 
   return (
     <div className="relative border rounded-3xl shadow-lg overflow-hidden max-w-sm bg-white">
@@ -123,8 +108,6 @@ const CarCard = ({
         <h2 className="text-2xl font-semibold">{carModel}</h2>
         {/* สถานะ */}
         <p className="text-lg text-gray-500 mt-2">{status}</p>
-        {/* เวลาเหลือ */}
-        <p className="text-lg font-semibold mt-4">Time left: {formatTime(timeLeft)}</p>
         {/* ปุ่ม View Details */}
         <div className="flex justify-center mt-6">
           <a

@@ -48,6 +48,8 @@ function Page() {
     }));
   };
 
+  
+
   return (
     <div className='font-happy'>
       <Navbar />
@@ -88,9 +90,8 @@ function Page() {
             key={car.car_ID}
             carImage={`https://via.placeholder.com/400x300?text=Car+Image`}
             carModel={`${car.car_brand} ${car.car_model} ${car.car_rear}`}
-            status={"Current Bid : Start the bidding"}
-            countdownTime={3600}
-            detailsLink={`/car-details/${car.car_ID}`}
+            status={`Current Bid : $ ${car.current_bid} `}
+            detailsLink={`/auction/detail/${car.car_ID}`}
             car_ID={car.car_ID}
             onFavoriteToggle={handleFavoriteToggle}
           />

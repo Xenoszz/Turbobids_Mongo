@@ -87,6 +87,29 @@ export default function Home() {
       .catch(err => console.error('Error adding car:', err));
   };
 
+  // ฟังก์ชันลบรถยนต์
+const deleteCar = async (carID) => {
+  if (confirm('Are you sure you want to delete this car?')) {
+    try {
+      const response = await fetch(`http://localhost:9500/api/deleteCar/${carID}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // รีเฟรชข้อมูลรถยนต์
+        fetchCars(); // ดึงข้อมูลรถใหม่
+        alert('Car deleted successfully!');
+      } else {
+        alert('Failed to delete car');
+      }
+    } catch (error) {
+      console.error('Error deleting car:', error);
+      alert('Error deleting car');
+    }
+  }
+};
+
+
   // ฟังก์ชันอัพเดตค่าใน state เมื่อมีการกรอกข้อมูลในฟอร์ม
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -138,7 +161,7 @@ export default function Home() {
             <div className="col-span-1">
              <button
                className="bg-red-500 text-white px-4 py-1 rounded"
-               onClick={() => deleteCar(car.car_ID)} // คุณต้องสร้างฟังก์ชัน deleteCar
+               onClick={() => deleteCar(car.car_ID)} 
              >
                Delete
              </button>
