@@ -21,7 +21,7 @@ export const decodeToken = () => {
     if (decoded && decoded.exp) {
       const currentTime = Math.floor(Date.now() / 1000); // เวลาปัจจุบันในหน่วยวินาที
       if (decoded.exp < currentTime) {
-        console.error('Token has expired');
+          // console.error('Token has expired');
         return null; // คืนค่า null ถ้า token หมดอายุ
       }
     }

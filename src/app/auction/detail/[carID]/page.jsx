@@ -13,9 +13,10 @@ const VehicleDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
-  const [bidAmount, setBidAmount] = useState(""); // State to store user's bid input
-  const [isAuctionEnded, setIsAuctionEnded] = useState(false); // State to track auction status
-  const [bidStatus, setBidStatus] = useState("Open"); // Track bid status
+  const [bidAmount, setBidAmount] = useState(""); 
+  const [isAuctionEnded, setIsAuctionEnded] = useState(false); 
+  const [isAuctionStarted, setIsAuctionStarted] = useState(false); 
+  const [bidStatus, setBidStatus] = useState("Open"); 
   const params = useParams();
   const userID = getUserIdFromToken(); 
   const router = useRouter();
@@ -47,6 +48,28 @@ const VehicleDetail = () => {
   useEffect(() => {
     if (!car || !car.auction_end_date) return;
 
+    let auctionstartdate = car.auction_start_date;
+    if (auctionstartdate.includes('T')) {
+      auctionstartdate = auctionstartdate.split('T')[0];
+    }
+    if (auctionstartdate.includes('Z')) {
+      auctionstartdate = auctionstartdate.replace('Z', '');
+    }
+  
+    let auctionStarttime= car.auction_start_time;
+    if (auctionStarttime.includes('T')) {
+      auctionStarttime = auctionStarttime.replace('T', '');
+    }
+    if (auctionStarttime.includes('Z')) {
+      auctionStarttime = auctionStarttime.replace('Z', '');
+    }
+
+    const auctionStartDateTimeString = `${auctionstartdate}T${auctionStarttime}`;
+    console.log('Auction End Date and Time:', auctionStartDateTimeString);
+  
+    const auctionStartDateTime = new Date(auctionStartDateTimeString);
+    console.log('Auction End DateTime Object:', auctionStartDateTime);
+
     let auctionEndDate = car.auction_end_date;
     if (auctionEndDate.includes('T')) {
       auctionEndDate = auctionEndDate.split('T')[0];
@@ -55,7 +78,6 @@ const VehicleDetail = () => {
       auctionEndDate = auctionEndDate.replace('Z', '');
     }
   
-
     let auctionEndTime = car.auction_end_time;
     if (auctionEndTime.includes('T')) {
       auctionEndTime = auctionEndTime.replace('T', '');
@@ -67,7 +89,6 @@ const VehicleDetail = () => {
     const auctionEndDateTimeString = `${auctionEndDate}T${auctionEndTime}`;
     console.log('Auction End Date and Time:', auctionEndDateTimeString);
   
-
     const auctionEndDateTime = new Date(auctionEndDateTimeString);
     console.log('Auction End DateTime Object:', auctionEndDateTime);
   
@@ -77,6 +98,7 @@ const VehicleDetail = () => {
     
     const now = new Date();
     console.log('Current Date and Time:', now);
+
     
     // เปรียบเทียบเวลาปัจจุบันกับเวลาสิ้นสุดการประมูล
     if (now >= auctionEndDateTime) {
@@ -84,7 +106,20 @@ const VehicleDetail = () => {
       setIsAuctionEnded(true);
       setTimeLeft("00:00:00");
       return; // การประมูลสิ้นสุดแล้ว ไม่ต้องตั้งค่าตัวนับเวลา
+    } else if (now < auctionStartDateTime) {
+      // การประมูลยังไม่เริ่ม
+      setIsAuctionStarted(false);
+      setBidStatus("Coming Soon");
+      setTimeLeft("Coming Soon");
+      return;
+    } else {
+      // การประมูลกำลังดำเนินอยู่
+      setIsAuctionStarted(true);
+      setBidStatus("Open");
+      setIsAuctionEnded(false);
     }
+
+    
   
     const calculateTimeLeft = () => {
       const now = new Date(); 
@@ -179,21 +214,20 @@ const VehicleDetail = () => {
 
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="w-full lg:w-2/3 space-y-4">
-            <div className="relative bg-white p-4 rounded-md shadow">
-              {car?.car_image && (
-                <img
-                  src={car.car_image}
-                  alt={car.car_model}
-                  className="w-full h-64 object-cover rounded-md"
-                />
-              )}
-            </div>
+          <div className="relative bg-white p-4 rounded-md shadow">
+            <img
+              src={car?.car_image || "/IMG/byd.JPG"}
+              alt={car?.car_model || "Car Image"}
+              className="w-full h- object-cover rounded-md"
+            />
+          </div>
+
 
             <div className="flex gap-2 overflow-x-auto">
               {[...Array(8)].map((_, index) => (
                 <img
                   key={index}
-                  src={car?.car_image || ""}
+                  src={car?.car_image || "/IMG/byd.JPG"}
                   alt={`Thumbnail ${index}`}
                   className="w-24 h-16 object-cover rounded-md cursor-pointer"
                 />
@@ -235,7 +269,14 @@ const VehicleDetail = () => {
                   >
                     Complete Auction
                   </button>
-                ) : (
+                ) : bidStatus === "Coming Soon" ? (
+                  <button
+                    className="w-full bg-gray-500 text-white py-2 rounded-md mt-2 cursor-not-allowed"
+                    disabled
+                  >
+                    Coming Soon
+                  </button>
+                ) :(
                   <>
                     <label className="block text-sm font-semibold mb-1">Your Bid:</label>
                     <input

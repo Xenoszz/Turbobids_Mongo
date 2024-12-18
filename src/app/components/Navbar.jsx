@@ -7,45 +7,45 @@ import { decodeToken } from '@/app/utils/auth';
 
 export function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(null); // สำหรับจัดการ dropdown
+  const [dropdownVisible, setDropdownVisible] = useState(null); 
   const router = useRouter();
   const dropdownRef = useRef(null);
 
-  // ตรวจสอบ token ทุกครั้งที่คอมโพเนนต์โหลด
+
   useEffect(() => {
     const checkToken = () => {
-      const decoded = decodeToken();  // ใช้ decodeToken เพื่อดึงข้อมูล token
+      const decoded = decodeToken();  
       if (decoded) {
-        console.log('Token decoded:', decoded);
-        setIsAuthenticated(true);  // ถ้ามี token หรือ token ยังไม่หมดอายุ
+        // console.log('Token decoded:', decoded);
+        setIsAuthenticated(true);  
       } else {
-        console.log('No valid token');
-        setIsAuthenticated(false);  // ไม่มี token หรือ token หมดอายุ
+        // console.log('No valid token');
+        setIsAuthenticated(false);  
       }
     };
     
     checkToken();
-  }, []);  // ใช้ [] เพื่อให้ useEffect ทำงานแค่ครั้งเดียวเมื่อคอมโพเนนต์โหลด
+  }, []);  
 
-  // ฟังก์ชันที่ใช้ในการนำทาง
+
   const handleNavigation = (path) => {
     if (isAuthenticated) {
-      router.push(path); // ถ้า user authentication ผ่าน, ไปที่ path ที่กำหนด
+      router.push(path); 
     } else {
-      router.push('/auth/login'); // ถ้า user ยังไม่เข้าสู่ระบบ, ไปหน้า login
+      router.push('/auth/login'); 
     }
   };
 
-  // ฟังก์ชันจัดการ dropdown visibility
+
   const toggleDropdown = (menu) => {
-    setDropdownVisible((prev) => (prev === menu ? null : menu)); // เปิด/ปิด dropdown
+    setDropdownVisible((prev) => (prev === menu ? null : menu)); 
   };
 
-  // ฟังก์ชันจัดการการออกจากระบบ (Sign Out)
+
   const handleSignOut = () => {
-    localStorage.removeItem('token'); // ลบ token
-    setIsAuthenticated(false); // อัปเดตสถานะการล็อกอิน
-    router.push('/auth/login'); // ไปหน้า login
+    localStorage.removeItem('token'); 
+    setIsAuthenticated(false); 
+    router.push('/auth/login'); 
   };
 
   return (

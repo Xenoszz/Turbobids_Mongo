@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CarCard from '../components/CarCard';
+import { CarSearchForm } from "../components/Car_Home/CarSearchForm";
+import { SearchButton } from "../components/Car_Home/SearchButton";
 import { Star } from 'lucide-react';
 import axios from 'axios';
 
@@ -38,7 +40,7 @@ function Page() {
       });
   }, []);
 
-  const sortedCars = cars.sort((a, b) => b.rating - a.rating);
+  const sortedCars = cars.sort((a, b) => b.car_rating - a.car_rating);
   const topCars = sortedCars.slice(0, 4);
 
   const handleFavoriteToggle = (car_ID, isFavorited) => {
@@ -54,41 +56,27 @@ function Page() {
     <div className='font-happy'>
       <Navbar />
       <div className='p-4 md:p-8'>
-        <h2 className='max-w-5xl mx-auto text-3xl mt-10'>Search Your Car!</h2>
-        <div className='flex justify-center rounded-3xl max-w-6xl mx-auto bg-blue-300 p-6 space-x-4'>
-          {Object.keys(carData).map((key) => (
-            <div
-              key={key}
-              className="bg-gray-300 rounded-full px-6 py-3 flex items-center justify-center"
-            >
-              <select
-                className="bg-transparent font-bold"
-                onChange={(e) => setSearchParams({ ...searchParams, [key]: e.target.value })}
-              >
-                <option value="">{key.charAt(0).toUpperCase() + key.slice(1)}</option>
-                {carData[key].map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+          <div className='max-w-5xl mx-auto text-3xl mt-10 '>
+            <h2>Search Your Car!</h2>
+          </div>
+          <div className='flex justify-center rounded-3xl max-w-6xl mx-auto bg-[#76A0FF]'>
+            <div className='text-4xl mt-8 mb-8'>
+                <CarSearchForm />
             </div>
-          ))}
-        </div>
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={handleSearch}
-            className="bg-blue-500 text-white px-6 py-3 rounded-full"
-          >
-            SEARCH
-          </button>
-        </div>
-      </div>
+          </div>
+          <div className="mt-6 flex justify-center">
+              <SearchButton onClick={handleSearch} />
+          </div>
+
+
+
+</div>
+
       <div className="flex justify-center gap-20 mt-12 mb-24">
         {topCars.map((car) => (
           <CarCard
             key={car.car_ID}
-            carImage={`https://via.placeholder.com/400x300?text=Car+Image`}
+            carImage={`/IMG/byd.JPG`}
             carModel={`${car.car_brand} ${car.car_model} ${car.car_rear}`}
             status={`Current Bid : $ ${car.current_bid} `}
             detailsLink={`/auction/detail/${car.car_ID}`}
