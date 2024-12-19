@@ -9,6 +9,7 @@ import { CarSearchForm } from "../components/Car_Home/CarSearchForm";
 import { SearchButton } from "../components/Car_Home/SearchButton";
 import { Star } from 'lucide-react';
 import axios from 'axios';
+import { getUserIdFromToken } from "@/app/utils/auth";
 
 export const carData = {
   brands: ["Toyota", "Honda", "BMW", "Mercedes", "Tesla"],
@@ -22,19 +23,14 @@ function Page() {
   const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState({});
-  const [searchParams, setSearchParams] = useState({});
 
-  const handleSearch = () => {
-    const query = new URLSearchParams(searchParams).toString();
-    router.push(`/auction/today?${query}`);
-  };
 
   useEffect(() => {
-    axios
-      .post('http://localhost:9500/cars')
-      .then((response) => {
-        setCars(response.data);
-      })
+    axios.post('http://localhost:8000/cars').then((response) => {
+    setCars(response.data);
+  
+  
+    })
       .catch((err) => {
         setError('เกิดข้อผิดพลาดในการดึงข้อมูล');
       });
@@ -43,11 +39,28 @@ function Page() {
   const sortedCars = cars.sort((a, b) => b.car_rating - a.car_rating);
   const topCars = sortedCars.slice(0, 4);
 
-  const handleFavoriteToggle = (car_ID, isFavorited) => {
-    setFavorites((prev) => ({
-      ...prev,
-      [car_ID]: isFavorited,
-    }));
+  
+  const userid = getUserIdFromToken(); 
+
+  const handleFavoriteToggle = async (car_ID, isFavorited) => {
+    try {
+
+      const user_ID = userid; 
+      
+      await axios.post('http://localhost:8000/favorites', {
+        user_ID,
+        car_ID,
+        isFavorited
+      });
+
+      // อัพเดทสถานะ favorite ใน state
+      setFavorites((prev) => ({
+        ...prev,
+        [car_ID]: isFavorited,
+      }));
+    } catch (err) {
+      console.error("Error while toggling favorite:", err);
+    }
   };
 
   
@@ -65,7 +78,7 @@ function Page() {
             </div>
           </div>
           <div className="mt-6 flex justify-center">
-              <SearchButton onClick={handleSearch} />
+              <SearchButton onClick={null} />
           </div>
 
 
@@ -75,12 +88,12 @@ function Page() {
       <div className="flex justify-center gap-20 mt-12 mb-24">
         {topCars.map((car) => (
           <CarCard
-            key={car.car_ID}
+            key={car._ID}
             carImage={`/IMG/byd.JPG`}
             carModel={`${car.car_brand} ${car.car_model} ${car.car_rear}`}
             status={`Current Bid : $ ${car.current_bid} `}
             detailsLink={`/auction/detail/${car.car_ID}`}
-            car_ID={car.car_ID}
+            car_ID={car._id}
             onFavoriteToggle={handleFavoriteToggle}
           />
         ))}

@@ -23,7 +23,7 @@ const CarCard = ({
   const checkFavoriteStatus = async (carID) => {
     try {
       const response = await axios.post(
-        "http://localhost:9500/favorites/status",
+        "http://localhost:8000/favorites/status",
         {
           car_ID: carID, 
           userID: userID, 
@@ -58,7 +58,7 @@ const CarCard = ({
     try {
  
       const response = await axios.post(
-        "http://localhost:9500/favorites",
+        "http://localhost:8000/favorites",
         {
           car_ID: car_ID, 
           userID: userID, 

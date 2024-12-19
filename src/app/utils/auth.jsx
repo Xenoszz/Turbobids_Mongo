@@ -12,17 +12,16 @@ export const getToken = () => {
 // ฟังก์ชันสำหรับ decode token
 export const decodeToken = () => {
   const token = getToken();
-  if (!token) return null; // ถ้าไม่มี token ให้คืนค่า null
+  if (!token) return null; 
   
   try {
-    // ใช้ jwt.decode เพื่อ decode token
+
     const decoded = jwt.decode(token);
-    // ตรวจสอบว่า token หมดอายุหรือไม่
     if (decoded && decoded.exp) {
-      const currentTime = Math.floor(Date.now() / 1000); // เวลาปัจจุบันในหน่วยวินาที
+      const currentTime = Math.floor(Date.now() / 1000); 
       if (decoded.exp < currentTime) {
           // console.error('Token has expired');
-        return null; // คืนค่า null ถ้า token หมดอายุ
+        return null; 
       }
     }
     return decoded; // คืนค่า decoded token
@@ -33,12 +32,12 @@ export const decodeToken = () => {
 };
 
 export const getUserIdFromToken = () => {
-  const token = getToken(); // ดึง token จาก localStorage
+  const token = getToken(); 
   if (token) {
-    const decoded = jwt.decode(token); // ถอดรหัส token
+    const decoded = jwt.decode(token); 
     const id = decoded?.id;
-    return id; // ดึง user_id จาก decoded token (สมมุติว่า 'id' คือ key ที่เก็บ user_id)
+    return id; 
 
   }
-  return null; // ถ้าไม่มี token ให้คืนค่า null
+  return null; 
 };

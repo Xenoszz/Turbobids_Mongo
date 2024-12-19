@@ -29,39 +29,7 @@ function RegisterPage() {
     }
 
     try {
-      // Check if user exists on localhost:5000
-    //   const resCheckUser = await fetch("http://localhost:5000/api/auth/checkuser", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ email }),
-    //   });
-
-    //   const { user } = await resCheckUser.json();
-
-    //   if (user) {
-    //     setError("User already exists on 5000!");
-    //     return;
-    //   }
-
-    //   // Register new user on localhost:5000
-    //   const resRegister5000 = await fetch("http://localhost:5000/api/auth/register", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ username, firstname, lastname, email, password }),
-    //   });
-
-    //   if (!resRegister5000.ok) {
-    //     console.log("User registration failed on 5000.");
-    //     setError("Registration failed on 5000, please try again.");
-    //     return;
-    //   }
-
-      // Check if user exists on localhost:6000
-      const resCheckUser6000 = await fetch("http://localhost:9500/api/auth/checkuser", {
+      const resCheckUser = await fetch("http://localhost:8000/api/auth/checkuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,15 +37,14 @@ function RegisterPage() {
         body: JSON.stringify({ email }),
       });
 
-      const { user: user6000 } = await resCheckUser6000.json();
+      const { user } = await resCheckUser.json();
 
-      if (user6000) {
-        setError("User already exists on 6000!");
+      if (user) {
+        setError("User already exists on 8000!");
         return;
       }
 
-      // Register new user on localhost:6000
-      const resRegister6000 = await fetch("http://localhost:9500/api/auth/register", {
+      const resRegister8000 = await fetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,14 +52,15 @@ function RegisterPage() {
         body: JSON.stringify({ username, firstname, lastname, email, password }),
       });
 
-      if (!resRegister6000.ok) {
-        console.log("User registration failed on 6000.");
-        setError("Registration failed on 6000, please try again.");
+      if (!resRegister8000.ok) {
+        console.log("User registration failed on 8000.");
+        setError("Registration failed on 8000, please try again.");
         return;
       }
 
-      // Success
-      setError(""); // Clear any previous errors
+
+
+      setError(""); 
       setSuccess("User registration successful on both servers!");
       router.push("/auth/login");
     } catch (error) {
